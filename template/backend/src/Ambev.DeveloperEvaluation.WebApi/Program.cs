@@ -29,12 +29,23 @@ public class Program
             builder.AddBasicHealthChecks();
             builder.Services.AddSwaggerGen();
 
+            var useInMemory = builder.Configuration.GetValue<bool>("UseInMemoryDatabase");
+
             builder.Services.AddDbContext<DefaultContext>(options =>
-                options.UseNpgsql(
-                    builder.Configuration.GetConnectionString("DefaultConnection"),
-                    b => b.MigrationsAssembly("Ambev.DeveloperEvaluation.ORM")
-                )
-            );
+            {
+                if (useInMemory)
+                {
+                    options.UseInMemoryDatabase("sales-db");
+                }
+                else
+                {
+                    // Use PostgreSQL with the connection string from appsettings.json
+                    options.UseNpgsql(
+                     builder.Configuration.GetConnectionString("DefaultConnection"),
+                     b => b.MigrationsAssembly("Ambev.DeveloperEvaluation.ORM")
+                 );
+                }
+            });
 
             builder.Services.AddJwtAuthentication(builder.Configuration);
 
