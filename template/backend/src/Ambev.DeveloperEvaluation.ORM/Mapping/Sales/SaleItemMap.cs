@@ -12,7 +12,7 @@ public class SaleItemMap : IEntityTypeConfiguration<SaleItem>
 
         b.HasKey(x => x.Id);
 
-        b.Property<string>("SaleId")
+        b.Property<Guid>("SaleId")
             .HasColumnName("sale_id")
             .IsRequired();
 

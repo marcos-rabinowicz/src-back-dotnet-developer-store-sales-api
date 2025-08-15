@@ -20,7 +20,7 @@ public class SaleRepository : ISaleRepository
 
     public async Task<Sale?> GetByIdAsync(Guid id, CancellationToken ct = default)
         => await _db.Sales
-            .Include("_items") // usa backing field
+            .Include(s => s.Items) // usa backing field
             .FirstOrDefaultAsync(s => s.Id == id, ct);
 
     public async Task<Sale?> GetBySaleNumberAsync(string saleNumber, CancellationToken ct = default)

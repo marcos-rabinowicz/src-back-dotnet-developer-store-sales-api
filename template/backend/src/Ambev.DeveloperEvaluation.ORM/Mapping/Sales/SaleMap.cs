@@ -44,13 +44,14 @@ public class SaleMap : IEntityTypeConfiguration<Sale>
             .IsRequired();
 
         // Relacionamento 1:N com backing field _items
-        b.HasMany(typeof(SaleItem), "_items")
+        b.HasMany(s => s.Items)
          .WithOne()
          .HasForeignKey("SaleId")
          .OnDelete(DeleteBehavior.Cascade);
 
         // Usa o backing field para acesso
         var nav = b.Metadata.FindNavigation(nameof(Sale.Items));
+        nav?.SetField("_items");
         nav?.SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }
