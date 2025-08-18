@@ -1,0 +1,55 @@
+@baseUrl = http://localhost:5000
+@saleId = {{saleId}}
+@itemId = {{itemId}}
+
+### CreateSale
+POST {{baseUrl}}/api/sales
+Content-Type: application/json
+
+{
+  "saleNumber": "S-{{$timestamp}}",
+  "date": "{{$isoTimestamp}}",
+  "customerId": "{{$uuid}}",
+  "customerName": "Customer A",
+  "branchId": "{{$uuid}}",
+  "branchName": "Branch RJ",
+  "items": [
+    { "productId": "{{$uuid}}", "productName": "Beer A", "quantity": 3, "unitPrice": 10 },
+    { "productId": "{{$uuid}}", "productName": "Beer B", "quantity": 4, "unitPrice": 10 },
+    { "productId": "{{$uuid}}", "productName": "Beer C", "quantity": 10, "unitPrice": 10 }
+  ]
+}
+> {% client.global.set("saleId", response.body.id); %}
+
+### GetSale
+GET {{baseUrl}}/api/sales/{{saleId}}
+
+### AddItem
+POST {{baseUrl}}/api/sales/{{saleId}}/items
+Content-Type: application/json
+
+{
+  "saleId": "{{saleId}}",
+  "productId": "{{$uuid}}",
+  "productName": "Beer X",
+  "quantity": 10,
+  "unitPrice": 10
+}
+> {% client.global.set("itemId", response.body.itemId); %}
+
+### ChangeItem
+PUT {{baseUrl}}/api/sales/{{saleId}}/items/{{itemId}}
+Content-Type: application/json
+
+{
+  "saleId": "{{saleId}}",
+  "itemId": "{{itemId}}",
+  "quantity": 4,
+  "unitPrice": 15
+}
+
+### CancelItem
+POST {{baseUrl}}/api/sales/{{saleId}}/items/{{itemId}}/cancel
+
+### CancelSale
+POST {{baseUrl}}/api/sales/{{saleId}}/cancel
