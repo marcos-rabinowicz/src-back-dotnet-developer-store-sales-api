@@ -1,0 +1,145 @@
+{
+  "info": {
+    "_postman_id": "a41b2f25-1e4a-4e9c-9157-6d0f7e9a9b11",
+    "name": "Ambev Store Sales API",
+    "description": "Coleção para testar os endpoints de Sales (Create/Get/Cancel Sale; Add/Change/Cancel Item).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Variáveis de tempo padrão para qualquer request",
+          "pm.collectionVariables.set('timestamp', Date.now());",
+          "pm.collectionVariables.set('isoNow', new Date().toISOString());"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Sales / CreateSale",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/sales",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "sales"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"saleNumber\": \"S-{{timestamp}}\",\n  \"date\": \"{{isoNow}}\",\n  \"customerId\": \"{{$randomUUID}}\",\n  \"customerName\": \"Customer A\",\n  \"branchId\": \"{{$randomUUID}}\",\n  \"branchName\": \"Branch RJ\",\n  \"items\": [\n    { \"productId\": \"{{$randomUUID}}\", \"productName\": \"Beer A\", \"quantity\": 3,  \"unitPrice\": 10 },\n    { \"productId\": \"{{$randomUUID}}\", \"productName\": \"Beer B\", \"quantity\": 4,  \"unitPrice\": 10 },\n    { \"productId\": \"{{$randomUUID}}\", \"productName\": \"Beer C\", \"quantity\": 10, \"unitPrice\": 10 }\n  ]\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 Created', function () { pm.response.to.have.status(201); });",
+              "var data = pm.response.json();",
+              "pm.collectionVariables.set('saleId', data.id);",
+              "console.log('saleId =', data.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sales / GetSale",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/sales/{{saleId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "sales", "{{saleId}}"]
+        }
+      }
+    },
+    {
+      "name": "Sales / AddItem",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/sales/{{saleId}}/items",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "sales", "{{saleId}}", "items"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"saleId\": \"{{saleId}}\",\n  \"productId\": \"{{$randomUUID}}\",\n  \"productName\": \"Beer X\",\n  \"quantity\": 10,\n  \"unitPrice\": 10\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 OK', function () { pm.response.to.have.status(200); });",
+              "var data = pm.response.json();",
+              "pm.collectionVariables.set('itemId', data.itemId);",
+              "console.log('itemId =', data.itemId);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sales / ChangeItem",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/sales/{{saleId}}/items/{{itemId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "sales", "{{saleId}}", "items", "{{itemId}}"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"saleId\": \"{{saleId}}\",\n  \"itemId\": \"{{itemId}}\",\n  \"quantity\": 4,\n  \"unitPrice\": 15\n}"
+        }
+      }
+    },
+    {
+      "name": "Sales / CancelItem",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/sales/{{saleId}}/items/{{itemId}}/cancel",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "sales", "{{saleId}}", "items", "{{itemId}}", "cancel"]
+        }
+      }
+    },
+    {
+      "name": "Sales / CancelSale",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/sales/{{saleId}}/cancel",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "sales", "{{saleId}}", "cancel"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "saleId", "value": "" },
+    { "key": "itemId", "value": "" },
+    { "key": "timestamp", "value": "" },
+    { "key": "isoNow", "value": "" }
+  ]
+}
