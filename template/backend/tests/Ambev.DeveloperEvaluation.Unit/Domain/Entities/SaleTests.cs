@@ -32,15 +32,18 @@ public class SaleTests
     public void AddItem_AccumulatesTotalWithDiscounts()
     {
         var s = NewSale();
-        // item1: 3 x 10 => sem desconto => 30
+        // item1: 3 x 10 => 30 (0%)
         s.AddItem(IdentitiesFactory.Product("P1"), 3, 10m);
-        // item2: 4 x 10 => 10% => 36
+        // item2: 4 x 10 => 36 (10%)
         s.AddItem(IdentitiesFactory.Product("P2"), 4, 10m);
-        // item3: 10 x 10 => 20% => 80
+        // item3: 10 x 10 => 80 (20%)
         s.AddItem(IdentitiesFactory.Product("P3"), 10, 10m);
 
         s.TotalAmount.Should().Be(30m + 36m + 80m);
-        s.DomainEvents.Should().ContainSingle(e => e.GetType().Name.Contains("SaleModified"));
+
+        // agora esperamos 3 eventos de modificação (um por AddItem)
+        s.DomainEvents.Count(e => e.GetType().Name.Contains("SaleModified"))
+        .Should().Be(3);
     }
 
     [Fact]

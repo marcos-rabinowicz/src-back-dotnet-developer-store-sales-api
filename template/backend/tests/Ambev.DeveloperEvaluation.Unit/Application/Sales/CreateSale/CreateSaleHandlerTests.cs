@@ -30,7 +30,7 @@ public class CreateSaleHandlerTests
         result.Items.Should().HaveCount(3);
         result.TotalAmount.Should().Be(30m + 36m + 80m); // 146
         result.Status.Should().Be("Active");
-        repo.Verify(r => r.AddAsync(It.IsAny<Domain.Entities.Sale>(), It.IsAny<CancellationToken>()), Times.Once);
+        repo.Verify(r => r.AddAsync(It.IsAny<Ambev.DeveloperEvaluation.Domain.Entities.Sale>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]

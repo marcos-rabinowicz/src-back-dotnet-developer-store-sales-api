@@ -1,4 +1,3 @@
-using AutoMapper;
 using MediatR;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.ValueObjects;
@@ -8,13 +7,8 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.Items.AddItem;
 public class AddItemHandler : IRequestHandler<AddItemCommand, AddItemResult>
 {
     private readonly ISaleRepository _repo;
-    private readonly IMapper _mapper;
 
-    public AddItemHandler(ISaleRepository repo, IMapper mapper)
-    {
-        _repo = repo;
-        _mapper = mapper;
-    }
+    public AddItemHandler(ISaleRepository repo) => _repo = repo;
 
     public async Task<AddItemResult> Handle(AddItemCommand request, CancellationToken ct)
     {
@@ -30,11 +24,14 @@ public class AddItemHandler : IRequestHandler<AddItemCommand, AddItemResult>
 
         await _repo.UpdateAsync(sale, ct);
 
-        var dto = _mapper.Map<AddItemResult>(item) with
-        {
-            SaleId = sale.Id,
-            SaleTotalAmount = sale.TotalAmount
-        };
-        return dto;
+        return new AddItemResult(
+            SaleId: sale.Id,
+            ItemId: item.Id,
+            Quantity: item.Quantity,
+            UnitPrice: item.UnitPrice,
+            DiscountPercent: item.DiscountPercent,
+            LineTotal: item.LineTotal,
+            SaleTotalAmount: sale.TotalAmount
+        );
     }
 }

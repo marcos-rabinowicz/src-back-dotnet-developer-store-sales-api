@@ -26,12 +26,12 @@ public class Sale
     public Sale(string saleNumber, DateTime date, CustomerIdentity customer, BranchIdentity branch)
     {
         Id = Guid.NewGuid();
-        UpdateHeader(saleNumber, date, customer, branch);
+        SetHeader(saleNumber, date, customer, branch);
         Status = SaleStatus.Active;
         AddEvent(new SaleCreatedEvent(Id, saleNumber, date, customer.Id, branch.Id));
     }
 
-    public void UpdateHeader(string saleNumber, DateTime date, CustomerIdentity customer, BranchIdentity branch)
+    private void SetHeader(string saleNumber, DateTime date, CustomerIdentity customer, BranchIdentity branch)
     {
         if (string.IsNullOrWhiteSpace(saleNumber))
             throw new DomainException("Sale number is required.");
@@ -40,7 +40,12 @@ public class Sale
         Date = date;
         Customer = customer;
         Branch = branch;
+    }
 
+    public void UpdateHeader(string saleNumber, DateTime date, CustomerIdentity customer, BranchIdentity branch)
+    {
+        EnsureNotCancelled();
+        SetHeader(saleNumber, date, customer, branch);
         AddEvent(new SaleModifiedEvent(Id));
     }
 

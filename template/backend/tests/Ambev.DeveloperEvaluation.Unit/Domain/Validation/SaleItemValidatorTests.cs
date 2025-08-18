@@ -12,24 +12,14 @@ public class SaleItemValidatorTests
         new SaleItem(IdentitiesFactory.Product(), qty, 10m);
 
     [Fact]
-    public void Quantity_MustBeBetween1And20()
+    public void Quantity_OneAndTwenty_AreValid()
     {
-        var validator = new SaleItemValidator();
+        var v = new SaleItemValidator();
+        var item1 = new SaleItem(IdentitiesFactory.Product(), 1, 10m);
+        var item20 = new SaleItem(IdentitiesFactory.Product(), 20, 10m);
 
-        var ok = validator.Validate(NewItem(1));
-        ok.IsValid.Should().BeTrue();
-
-        var ok2 = validator.Validate(NewItem(20));
-        ok2.IsValid.Should().BeTrue();
-
-        var invalid = new SaleItem(IdentitiesFactory.Product(), 4, 10m);
-        invalid.ChangePricing(21, 10m); // força estado inválido via método? Não é possível – então apenas validar regra.
-
-        // Como não conseguimos criar >20 (o domínio bloqueia), testamos a regra de validação
-        // indiretamente através do Must da porcentagem:
-        var item = new SaleItem(IdentitiesFactory.Product(), 4, 10m);
-        var result = validator.Validate(item);
-        result.IsValid.Should().BeTrue();
+        v.Validate(item1).IsValid.Should().BeTrue();
+        v.Validate(item20).IsValid.Should().BeTrue();
     }
 
     [Theory]
