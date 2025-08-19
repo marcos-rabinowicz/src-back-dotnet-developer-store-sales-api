@@ -12,7 +12,7 @@ using Serilog;
 
 namespace Ambev.DeveloperEvaluation.WebApi;
 
-public class Program
+public partial class Program
 {
     public static void Main(string[] args)
     {
@@ -82,3 +82,4 @@ public class Program
         }
     }
 }
+
