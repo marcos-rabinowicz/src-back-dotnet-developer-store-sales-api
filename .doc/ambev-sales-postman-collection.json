@@ -1,145 +1,43 @@
 {
-  "info": {
-    "_postman_id": "a41b2f25-1e4a-4e9c-9157-6d0f7e9a9b11",
-    "name": "Ambev Store Sales API",
-    "description": "Coleção para testar os endpoints de Sales (Create/Get/Cancel Sale; Add/Change/Cancel Item).",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          "// Variáveis de tempo padrão para qualquer request",
-          "pm.collectionVariables.set('timestamp', Date.now());",
-          "pm.collectionVariables.set('isoNow', new Date().toISOString());"
-        ]
-      }
-    }
-  ],
+  "info": { "name": "Ambev Store Sales API", "_postman_id": "b4b8b5b6-aaaa-bbbb-cccc-000000000001", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
   "item": [
     {
-      "name": "Sales / CreateSale",
+      "name": "Create Sale",
       "request": {
         "method": "POST",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/api/sales",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "sales"]
-        },
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/api/sales", "host": ["{{baseUrl}}"], "path": ["api", "sales"] },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"saleNumber\": \"S-{{timestamp}}\",\n  \"date\": \"{{isoNow}}\",\n  \"customerId\": \"{{$randomUUID}}\",\n  \"customerName\": \"Customer A\",\n  \"branchId\": \"{{$randomUUID}}\",\n  \"branchName\": \"Branch RJ\",\n  \"items\": [\n    { \"productId\": \"{{$randomUUID}}\", \"productName\": \"Beer A\", \"quantity\": 3,  \"unitPrice\": 10 },\n    { \"productId\": \"{{$randomUUID}}\", \"productName\": \"Beer B\", \"quantity\": 4,  \"unitPrice\": 10 },\n    { \"productId\": \"{{$randomUUID}}\", \"productName\": \"Beer C\", \"quantity\": 10, \"unitPrice\": 10 }\n  ]\n}"
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('201 Created', function () { pm.response.to.have.status(201); });",
-              "var data = pm.response.json();",
-              "pm.collectionVariables.set('saleId', data.id);",
-              "console.log('saleId =', data.id);"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "Sales / GetSale",
-      "request": {
-        "method": "GET",
-        "url": {
-          "raw": "{{baseUrl}}/api/sales/{{saleId}}",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "sales", "{{saleId}}"]
+          "raw": "{\n  \"saleNumber\": \"S-20250001\",\n  \"date\": \"2025-01-01T12:00:00Z\",\n  \"customerId\": \"00000000-0000-0000-0000-000000000001\",\n  \"customerName\": \"Customer A\",\n  \"branchId\": \"00000000-0000-0000-0000-000000000002\",\n  \"branchName\": \"Branch RJ\",\n  \"items\": [\n    { \"productId\":\"00000000-0000-0000-0000-000000000101\", \"productName\":\"Beer A\", \"quantity\":3,  \"unitPrice\":10 },\n    { \"productId\":\"00000000-0000-0000-0000-000000000102\", \"productName\":\"Beer B\", \"quantity\":4,  \"unitPrice\":10 },\n    { \"productId\":\"00000000-0000-0000-0000-000000000103\", \"productName\":\"Beer C\", \"quantity\":10, \"unitPrice\":10 }\n  ]\n}"
         }
       }
     },
+    { "name": "Get Sale", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/sales/{{saleId}}", "host": ["{{baseUrl}}"], "path": ["api","sales","{{saleId}}"] } } },
+    { "name": "Cancel Sale", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/api/sales/{{saleId}}/cancel", "host": ["{{baseUrl}}"], "path": ["api","sales","{{saleId}}","cancel"] } } },
     {
-      "name": "Sales / AddItem",
+      "name": "Add Item",
       "request": {
         "method": "POST",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/api/sales/{{saleId}}/items",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "sales", "{{saleId}}", "items"]
-        },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"saleId\": \"{{saleId}}\",\n  \"productId\": \"{{$randomUUID}}\",\n  \"productName\": \"Beer X\",\n  \"quantity\": 10,\n  \"unitPrice\": 10\n}"
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('200 OK', function () { pm.response.to.have.status(200); });",
-              "var data = pm.response.json();",
-              "pm.collectionVariables.set('itemId', data.itemId);",
-              "console.log('itemId =', data.itemId);"
-            ]
-          }
-        }
-      ]
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/api/sales/{{saleId}}/items", "host": ["{{baseUrl}}"], "path": ["api","sales","{{saleId}}","items"] },
+        "body": { "mode": "raw", "raw": "{ \"saleId\":\"{{saleId}}\", \"productId\":\"00000000-0000-0000-0000-000000000104\", \"productName\":\"Beer X\", \"quantity\":10, \"unitPrice\":10 }" }
+      }
     },
     {
-      "name": "Sales / ChangeItem",
+      "name": "Update Item",
       "request": {
         "method": "PUT",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/api/sales/{{saleId}}/items/{{itemId}}",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "sales", "{{saleId}}", "items", "{{itemId}}"]
-        },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"saleId\": \"{{saleId}}\",\n  \"itemId\": \"{{itemId}}\",\n  \"quantity\": 4,\n  \"unitPrice\": 15\n}"
-        }
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/api/sales/{{saleId}}/items/{{itemId}}", "host": ["{{baseUrl}}"], "path": ["api","sales","{{saleId}}","items","{{itemId}}"] },
+        "body": { "mode": "raw", "raw": "{ \"saleId\":\"{{saleId}}\", \"itemId\":\"{{itemId}}\", \"quantity\":4, \"unitPrice\":15 }" }
       }
     },
-    {
-      "name": "Sales / CancelItem",
-      "request": {
-        "method": "POST",
-        "url": {
-          "raw": "{{baseUrl}}/api/sales/{{saleId}}/items/{{itemId}}/cancel",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "sales", "{{saleId}}", "items", "{{itemId}}", "cancel"]
-        }
-      }
-    },
-    {
-      "name": "Sales / CancelSale",
-      "request": {
-        "method": "POST",
-        "url": {
-          "raw": "{{baseUrl}}/api/sales/{{saleId}}/cancel",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "sales", "{{saleId}}", "cancel"]
-        }
-      }
-    }
+    { "name": "Cancel Item", "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/api/sales/{{saleId}}/items/{{itemId}}/cancel", "host": ["{{baseUrl}}"], "path": ["api","sales","{{saleId}}","items","{{itemId}}","cancel"] } } }
   ],
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:5000" },
     { "key": "saleId", "value": "" },
-    { "key": "itemId", "value": "" },
-    { "key": "timestamp", "value": "" },
-    { "key": "isoNow", "value": "" }
+    { "key": "itemId", "value": "" }
   ]
 }

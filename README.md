@@ -1,86 +1,111 @@
-# Developer Evaluation Project
+# Ambev – Store Sales API
 
-`READ CAREFULLY`
+> Desafio back-end (.NET 8) com foco em **regras de negócio de Vendas (Sales)**, DDD simplificado e Clean Architecture. Controllers finos, casos de uso claros, testes unit/integration, e opção de persistência **InMemory** ou **PostgreSQL**.
 
-## Instructions
-**The test below will have up to 7 calendar days to be delivered from the date of receipt of this manual.**
+## 🔗 Documentação
 
-- The code must be versioned in a public Github repository and a link must be sent for evaluation once completed
-- Upload this template to your repository and start working from it
-- Read the instructions carefully and make sure all requirements are being addressed
-- The repository must provide instructions on how to configure, execute and test the project
-- Documentation and overall organization will also be taken into consideration
+- Visão geral do desafio: [.doc/overview.md](.doc/overview.md)
+- Tech Stack: [.doc/tech-stack.md](.doc/tech-stack.md)
+- Frameworks: [.doc/frameworks.md](.doc/frameworks.md)
+- Convenções de API (Paginação, Ordenação, Filtro, Erros): [.doc/general-api.md](.doc/general-api.md)
+- **Sales API (principal)**: [.doc/sales-api.md](.doc/sales-api.md)
+- Estrutura do projeto: [.doc/project-structure.md](.doc/project-structure.md)
 
-## Use Case
-**You are a developer on the DeveloperStore team. Now we need to implement the API prototypes.**
+> Os arquivos **Products / Carts / Users / Auth** estão no diretório `.doc/` como **material de template** (não implementado nesta solução), apenas para referência de estilo de documentação:
+> [.doc/products-api.md](.doc/products-api.md) · [.doc/carts-api.md](.doc/carts-api.md) · [.doc/users-api.md](.doc/users-api.md) · [.doc/auth-api.md](.doc/auth-api.md)
 
-As we work with `DDD`, to reference entities from other domains, we use the `External Identities` pattern with denormalization of entity descriptions.
+---
 
-Therefore, you will write an API (complete CRUD) that handles sales records. The API needs to be able to inform:
+## 🧭 Arquitetura
 
-* Sale number
-* Date when the sale was made
-* Customer
-* Total sale amount
-* Branch where the sale was made
-* Products
-* Quantities
-* Unit prices
-* Discounts
-* Total amount for each item
-* Cancelled/Not Cancelled
+**Clean Architecture**  
+`Domain → Application → Infrastructure (ORM/IoC) → WebApi`
 
-It's not mandatory, but it would be a differential to build code for publishing events of:
-* SaleCreated
-* SaleModified
-* SaleCancelled
-* ItemCancelled
+- **Domain**: entidades, VOs, agregados, regras e *domain events*.
+- **Application**: **use cases** (handlers com MediatR), DTOs/Profiles (AutoMapper), validações.
+- **Infrastructure**: EF Core (PostgreSQL), repositórios, InMemory, IoC.
+- **WebApi**: controllers finos → apenas orquestram use cases & validação.
 
-If you write the code, **it's not required** to actually publish to any Message Broker. You can log a message in the application log or however you find most convenient.
+Árvore completa: ver [.doc/project-structure.md](.doc/project-structure.md)
 
-### Business Rules
+---
 
-* Purchases above 4 identical items have a 10% discount
-* Purchases between 10 and 20 identical items have a 20% discount
-* It's not possible to sell above 20 identical items
-* Purchases below 4 items cannot have a discount
+## ▶️ Como rodar
 
-These business rules define quantity-based discounting tiers and limitations:
+### 1) Requisitos
+- .NET 8 SDK
+- Docker (opcional, para subir PostgreSQL)
+- Postman (opcional) – coleção em `.doc/ambev-sales-postman-collection.json`
 
-1. Discount Tiers:
-   - 4+ items: 10% discount
-   - 10-20 items: 20% discount
+### 2) Banco (opção A – Docker)
+```bash
+docker run --name dev-pg \
+  -e POSTGRES_USER=dev -e POSTGRES_PASSWORD=dev \
+  -e POSTGRES_DB=developer_evaluation \
+  -p 5432:5432 -d postgres:16
 
-2. Restrictions:
-   - Maximum limit: 20 items per product
-   - No discounts allowed for quantities below 4 items
+### 3) Configuração
+A WebApi lê appsettings.json + appsettings.Development.json.
+Use Development para rodar local:
 
-## Overview
-This section provides a high-level overview of the project and the various skills and competencies it aims to assess for developer candidates. 
+// src/Ambev.DeveloperEvaluation.WebApi/appsettings.Development.json
+{
+  "Sales": { "Repository": "InMemory" }, // ou "EfCore"
+  "ConnectionStrings": {
+    "Default": "Host=localhost;Port=5432;Database=developer_evaluation;Username=dev;Password=dev;Include Error Detail=true"
+  }
+}
 
-See [Overview](/.doc/overview.md)
+O DefaultContextFactory também permite dotnet ef fora de execução da API, com a mesma connection string.
 
-## Tech Stack
-This section lists the key technologies used in the project, including the backend, testing, frontend, and database components. 
+### 4) Migrations (se usar PostgreSQL)
+# gerar (já enviado no repo como exemplo)
+```bash
+dotnet ef migrations add Sales_Init \
+  -c DefaultContext \
+  -p src/Ambev.DeveloperEvaluation.ORM/Ambev.DeveloperEvaluation.ORM.csproj \
+  -s src/Ambev.DeveloperEvaluation.WebApi/Ambev.DeveloperEvaluation.WebApi.csproj \
+  -o Migrations
+  
+# aplicar
+```bash
+dotnet ef database update \
+  -p src/Ambev.DeveloperEvaluation.ORM/Ambev.DeveloperEvaluation.ORM.csproj \
+  -s src/Ambev.DeveloperEvaluation.WebApi/Ambev.DeveloperEvaluation.WebApi.csproj
 
-See [Tech Stack](/.doc/tech-stack.md)
+5) Executar
+```bash
+dotnet run --project src/Ambev.DeveloperEvaluation.WebApi/Ambev.DeveloperEvaluation.WebApi.csproj
+# Swagger: http://localhost:<porta>/swagger
 
-## Frameworks
-This section outlines the frameworks and libraries that are leveraged in the project to enhance development productivity and maintainability. 
+🧪 Testes
+# todos os testes
+```bash
+dotnet test
 
-See [Frameworks](/.doc/frameworks.md)
+# por projeto
+```bash
+dotnet test tests/Ambev.DeveloperEvaluation.Unit/Ambev.DeveloperEvaluation.Unit.csproj
+dotnet test tests/Ambev.DeveloperEvaluation.Integration/Ambev.DeveloperEvaluation.Integration.csproj
+dotnet test tests/Ambev.DeveloperEvaluation.Functional/Ambev.DeveloperEvaluation.Functional.csproj
 
-<!-- 
-## API Structure
-This section includes links to the detailed documentation for the different API resources:
-- [API General](./docs/general-api.md)
-- [Products API](/.doc/products-api.md)
-- [Carts API](/.doc/carts-api.md)
-- [Users API](/.doc/users-api.md)
-- [Auth API](/.doc/auth-api.md)
--->
+🧰 Padrões e ferramentas
 
-## Project Structure
-This section describes the overall structure and organization of the project files and directories. 
+DDD (entities/VOs/aggregates/specifications/repository)
 
-See [Project Structure](/.doc/project-structure.md)
+Clean Architecture (separação de camadas)
+
+MediatR (use cases), AutoMapper (mapeamentos)
+
+EF Core (ORM), Npgsql
+
+xUnit + FluentAssertions + Bogus (Faker) + NSubstitute
+
+Serilog (logging), Swagger/OpenAPI
+
+Mais detalhes: .doc/tech-stack.md
+ e .doc/frameworks.md
+
+📄 Licença
+
+MIT

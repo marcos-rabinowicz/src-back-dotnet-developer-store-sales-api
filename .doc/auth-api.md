@@ -1,5 +1,9 @@
 [Back to README](../README.md)
 
+> **Nota**: este arquivo é **template** de documentação (não implementado nesta solução).
+
+# Auth API (template)
+… (mantido do template)
 
 ### Authentication
 

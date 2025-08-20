@@ -1,5 +1,11 @@
 [Back to README](../README.md)
 
+> **Nota**: este arquivo é **template** de documentação (não implementado nesta solução).
+
+# Carts API (template)
+… (mantido do template)
+
+
 ### Carts
 
 #### GET /carts

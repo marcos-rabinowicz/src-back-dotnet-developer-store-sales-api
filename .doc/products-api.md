@@ -1,5 +1,10 @@
 [Back to README](../README.md)
 
+> **Nota**: este arquivo é **template** de documentação (não implementado nesta solução).
+
+# Products API (template)
+… (mantido do template)
+
 ### Products
 
 #### GET /products
