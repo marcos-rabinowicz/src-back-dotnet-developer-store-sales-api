@@ -14,6 +14,8 @@
 > Os arquivos **Products / Carts / Users / Auth** estão no diretório `.doc/` como **material de template** (não implementado nesta solução), apenas para referência de estilo de documentação:
 > [.doc/products-api.md](.doc/products-api.md) · [.doc/carts-api.md](.doc/carts-api.md) · [.doc/users-api.md](.doc/users-api.md) · [.doc/auth-api.md](.doc/auth-api.md)
 
+- 🚀 **[Pipeline (build → test → DB → migrations → API → Postman)](./.doc/pipeline.md)**
+
 ---
 
 ## 🧭 Arquitetura

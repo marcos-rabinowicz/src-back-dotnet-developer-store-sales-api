@@ -1,0 +1,77 @@
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        run: dotnet restore Ambev.DeveloperEvaluation.sln
+      - name: Build
+        run: dotnet build Ambev.DeveloperEvaluation.sln -c Release --no-restore
+      - name: Test
+        run: dotnet test Ambev.DeveloperEvaluation.sln -c Release --no-build --logger "trx;LogFileName=test-results.trx"
+
+  # Integração com Postgres + Newman (deixe desativado até precisar)
+  integ_with_pg:
+    if: false
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: dev
+          POSTGRES_PASSWORD: dev
+          POSTGRES_DB: developer_evaluation
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U dev"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Setup Node (Newman)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Newman
+        run: npm i -g newman
+      - name: Apply EF Migrations
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+          DOTNET_ENVIRONMENT: Development
+          SalesRepository: Ef
+          Sales__Repository: EfCore
+          ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=developer_evaluation;Username=dev;Password=dev;Include Error Detail=true"
+        run: |
+          dotnet tool install -g dotnet-ef
+          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+          dotnet ef database update -p src/Ambev.DeveloperEvaluation.ORM/Ambev.DeveloperEvaluation.ORM.csproj -s src/Ambev.DeveloperEvaluation.WebApi/Ambev.DeveloperEvaluation.WebApi.csproj --connection "$ConnectionStrings__DefaultConnection"
+      - name: Run API (bg)
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+          DOTNET_ENVIRONMENT: Development
+          SalesRepository: Ef
+          Sales__Repository: EfCore
+          ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=developer_evaluation;Username=dev;Password=dev;Include Error Detail=true"
+          ASPNETCORE_URLS: "http://localhost:5056"
+        run: |
+          dotnet run --project src/Ambev.DeveloperEvaluation.WebApi/Ambev.DeveloperEvaluation.WebApi.csproj &
+          sleep 5
+      - name: Newman run
+        run: newman run .doc/ambev-sales-postman-collection.json --env-var baseUrl="http://localhost:5056"
