@@ -30,10 +30,18 @@ public partial class Program
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddDbContext<DefaultContext>(options =>
+            {
                 options.UseNpgsql(
                     builder.Configuration.GetConnectionString("DefaultConnection"),
                     b => b.MigrationsAssembly(typeof(DefaultContext).Assembly.GetName().Name)
-                ));
+                );
+
+                if (builder.Environment.IsDevelopment())
+                {
+                    options.EnableDetailedErrors();
+                    options.EnableSensitiveDataLogging();
+                }
+            });
 
             builder.Services.AddJwtAuthentication(builder.Configuration);
 
