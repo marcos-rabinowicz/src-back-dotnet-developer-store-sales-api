@@ -19,7 +19,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales;
 
 [ApiController]
 [Route("api/sales")]
-public class SalesController : ControllerBase // se seu template tem BaseController, pode herdar dele
+public class SalesController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;

@@ -7,7 +7,7 @@ public sealed record class ProductIdentity
     public Guid Id { get; }
     public string? Name { get; }
 
-    private ProductIdentity() { } // EF
+    private ProductIdentity() { }
     private ProductIdentity(Guid id, string name)
     {
         Id = id;

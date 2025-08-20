@@ -31,7 +31,7 @@ public sealed class DefaultContextFactory : IDesignTimeDbContextFactory<DefaultC
                 .SetBasePath(webApiDir)
                 .AddJsonFile("appsettings.json", optional: false)
                 .AddJsonFile($"appsettings.{env}.json", optional: true)
-                .AddEnvironmentVariables()  // <-- prioridade máxima
+                .AddEnvironmentVariables()
                 .Build();
 
             conn = cfg.GetConnectionString("DefaultConnection")

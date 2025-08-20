@@ -7,34 +7,35 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories;
 public class SaleRepository : ISaleRepository
 {
     private readonly DefaultContext _ctx;
+
     public SaleRepository(DefaultContext ctx) => _ctx = ctx;
 
-    public async Task<Sale?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    public async Task<Sale?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        // Para owned collection armazenada em campo privado "_items"
         return await _ctx.Sales
             .AsNoTracking()
-            .Include("_items")
-            .FirstOrDefaultAsync(s => s.Id == id, ct);
+            .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
     }
 
-    public async Task AddAsync(Sale sale, CancellationToken ct = default)
+    public async Task<Sale> AddAsync(Sale sale, CancellationToken cancellationToken = default)
     {
         _ctx.Sales.Add(sale);
-        await _ctx.SaveChangesAsync(ct);
+        await _ctx.SaveChangesAsync(cancellationToken);
+        return sale;
     }
 
-    public async Task UpdateAsync(Sale sale, CancellationToken ct = default)
+    public async Task UpdateAsync(Sale sale, CancellationToken cancellationToken = default)
     {
         _ctx.Sales.Update(sale);
-        await _ctx.SaveChangesAsync(ct);
+        await _ctx.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken ct = default)
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await _ctx.Sales.FindAsync([id], ct);
+        var entity = await _ctx.Sales.FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
         if (entity is null) return;
+
         _ctx.Sales.Remove(entity);
-        await _ctx.SaveChangesAsync(ct);
+        await _ctx.SaveChangesAsync(cancellationToken);
     }
 }

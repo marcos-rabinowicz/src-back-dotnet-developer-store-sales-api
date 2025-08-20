@@ -7,7 +7,7 @@ public sealed record class BranchIdentity
     public Guid Id { get; }
     public string? Name { get; }
 
-    private BranchIdentity() { } // EF
+    private BranchIdentity() { }
     private BranchIdentity(Guid id, string name)
     {
         Id = id;

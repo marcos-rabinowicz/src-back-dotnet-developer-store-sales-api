@@ -19,7 +19,7 @@ public class SaleItem
         ? 0m
         : Math.Round(Quantity * UnitPrice * (1 - DiscountPercent), 2);
 
-    private SaleItem() { } // ORM
+    private SaleItem() { }
 
     public SaleItem(ProductIdentity product, int quantity, decimal unitPrice)
     {
@@ -46,7 +46,6 @@ public class SaleItem
 
     private static decimal CalculateDiscountPercent(int quantity)
     {
-        // 4–9 => 10% | 10–20 => 20% | <4 => 0%
         if (quantity >= 10) return 0.20m;
         if (quantity >= 4) return 0.10m;
         return 0.00m;

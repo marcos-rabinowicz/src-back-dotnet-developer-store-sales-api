@@ -11,13 +11,13 @@ public class InMemorySaleRepository : ISaleRepository
     public Task<Sale?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         _store.TryGetValue(id, out var sale);
-        return Task.FromResult<Sale?>(sale);
+        return Task.FromResult(sale);
     }
 
-    public Task AddAsync(Sale sale, CancellationToken cancellationToken = default)
+    public Task<Sale> AddAsync(Sale sale, CancellationToken cancellationToken = default)
     {
         _store[sale.Id] = sale;
-        return Task.CompletedTask;
+        return Task.FromResult(sale);
     }
 
     public Task UpdateAsync(Sale sale, CancellationToken cancellationToken = default)
