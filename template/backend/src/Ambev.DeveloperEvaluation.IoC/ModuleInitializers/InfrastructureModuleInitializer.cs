@@ -16,13 +16,15 @@ public class InfrastructureModuleInitializer : IModuleInitializer
         builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<DefaultContext>());
         builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-        // Sales repository: por enquanto só InMemory (com chave de comutação preparada)
         var kind = builder.Configuration.GetValue<string>("SalesRepository") ?? "InMemory";
-        
+
         if (string.Equals(kind, "InMemory", StringComparison.OrdinalIgnoreCase))
         {
             builder.Services.AddSingleton<ISaleRepository, InMemorySaleRepository>();
         }
-        // else: no futuro registramos uma implementação EF aqui
+        else if (string.Equals(kind, "Ef", StringComparison.OrdinalIgnoreCase))
+        {
+            builder.Services.AddScoped<ISaleRepository, SaleRepository>();
+        }
     }
 }

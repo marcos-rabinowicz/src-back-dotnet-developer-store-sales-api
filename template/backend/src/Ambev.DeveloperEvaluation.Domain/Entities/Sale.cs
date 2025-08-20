@@ -8,10 +8,10 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities;
 public class Sale
 {
     public Guid Id { get; }
-    public string SaleNumber { get; private set; }
+    public string? SaleNumber { get; private set; }
     public DateTime Date { get; private set; }
-    public CustomerIdentity Customer { get; private set; }
-    public BranchIdentity Branch { get; private set; }
+    public CustomerIdentity? Customer { get; private set; }
+    public BranchIdentity? Branch { get; private set; }
     private readonly List<SaleItem> _items = new();
     public IReadOnlyCollection<SaleItem> Items => _items.AsReadOnly();
     public SaleStatus Status { get; private set; }
@@ -21,7 +21,7 @@ public class Sale
     private readonly List<object> _domainEvents = new();
     public IReadOnlyCollection<object> DomainEvents => _domainEvents.AsReadOnly();
 
-    private Sale() { } // ORM
+    private Sale() { }
 
     public Sale(string saleNumber, DateTime date, CustomerIdentity customer, BranchIdentity branch)
     {

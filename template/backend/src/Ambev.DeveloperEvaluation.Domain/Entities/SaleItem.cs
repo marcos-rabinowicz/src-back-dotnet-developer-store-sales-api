@@ -7,8 +7,8 @@ public class SaleItem
 {
     private const int MaxQuantityPerProduct = 20;
 
-    public Guid Id { get; }
-    public ProductIdentity Product { get; private set; }
+    public Guid Id { get; private set; }
+    public ProductIdentity? Product { get; private set; }
     public int Quantity { get; private set; }
     public decimal UnitPrice { get; private set; }
     /// <summary>0.10m = 10% | 0.20m = 20% — sempre derivado da quantidade.</summary>
@@ -48,7 +48,7 @@ public class SaleItem
     {
         // 4–9 => 10% | 10–20 => 20% | <4 => 0%
         if (quantity >= 10) return 0.20m;
-        if (quantity >= 4)  return 0.10m;
+        if (quantity >= 4) return 0.10m;
         return 0.00m;
     }
 }
