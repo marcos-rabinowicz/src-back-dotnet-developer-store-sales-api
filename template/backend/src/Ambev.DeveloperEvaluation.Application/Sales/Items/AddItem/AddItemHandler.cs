@@ -18,12 +18,13 @@ public sealed class AddItemHandler : IRequestHandler<AddItemCommand, AddItemResu
         AddItemValidator.EnsureValid(request);
 
         var sale = await _repo.GetByIdAsync(request.SaleId, ct)
-                   ?? throw new KeyNotFoundException("Sale not found.");
+                   ?? throw new KeyNotFoundException($"Sale '{request.SaleId}' not found.");
 
         sale.AddItem(
             ProductIdentity.Create(request.ProductId, request.ProductName),
             request.Quantity,
-            request.UnitPrice);
+            request.UnitPrice
+        );
 
         var item = sale.Items.LastOrDefault()
                    ?? throw new InvalidOperationException("Item could not be added to the sale.");
