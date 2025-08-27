@@ -1,4 +1,4 @@
-# Ambev – Store Sales API
+# API - Store Sales
 
 > Desafio back-end (.NET 8) com foco em **regras de negócio de Vendas (Sales)**, DDD simplificado e Clean Architecture. Controllers finos, casos de uso claros, testes unit/integration, e opção de persistência **InMemory** ou **PostgreSQL**.
 
@@ -111,3 +111,4 @@ Mais detalhes: .doc/tech-stack.md
 📄 Licença
 
 MIT
+
