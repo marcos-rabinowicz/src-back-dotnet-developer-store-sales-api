@@ -1,3 +1,3 @@
 namespace Ambev.DeveloperEvaluation.Domain.Events;
 
-public record SaleModifiedEvent(Guid SaleId);
+public record SaleModifiedEvent(Guid SaleId) : IDomainEvent;

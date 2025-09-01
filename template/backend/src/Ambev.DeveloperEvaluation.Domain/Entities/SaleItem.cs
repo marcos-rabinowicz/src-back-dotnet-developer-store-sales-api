@@ -11,10 +11,8 @@ public class SaleItem
     public ProductIdentity? Product { get; private set; }
     public int Quantity { get; private set; }
     public decimal UnitPrice { get; private set; }
-    /// <summary>0.10m = 10% | 0.20m = 20% — sempre derivado da quantidade.</summary>
     public decimal DiscountPercent { get; private set; }
     public bool IsCancelled { get; private set; }
-
     public decimal LineTotal => IsCancelled
         ? 0m
         : Math.Round(Quantity * UnitPrice * (1 - DiscountPercent), 2);

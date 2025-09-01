@@ -5,21 +5,19 @@ using Ambev.DeveloperEvaluation.Domain.ValueObjects;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities;
 
-public class Sale
+public class Sale : IHasDomainEvents
 {
     public Guid Id { get; }
     public string? SaleNumber { get; private set; }
     public DateTime Date { get; private set; }
+    public SaleStatus Status { get; private set; }
     public CustomerIdentity? Customer { get; private set; }
     public BranchIdentity? Branch { get; private set; }
-    private readonly List<SaleItem> _items = new();
     public IReadOnlyCollection<SaleItem> Items => _items.AsReadOnly();
-    public SaleStatus Status { get; private set; }
-
+    public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
     public decimal TotalAmount => Math.Round(_items.Sum(i => i.LineTotal), 2);
-
-    private readonly List<object> _domainEvents = new();
-    public IReadOnlyCollection<object> DomainEvents => _domainEvents.AsReadOnly();
+    private readonly List<SaleItem> _items = [];
+    private readonly List<IDomainEvent> _domainEvents = [];
 
     private Sale() { }
 
@@ -29,24 +27,6 @@ public class Sale
         SetHeader(saleNumber, date, customer, branch);
         Status = SaleStatus.Active;
         AddEvent(new SaleCreatedEvent(Id, saleNumber, date, customer.Id, branch.Id));
-    }
-
-    private void SetHeader(string saleNumber, DateTime date, CustomerIdentity customer, BranchIdentity branch)
-    {
-        if (string.IsNullOrWhiteSpace(saleNumber))
-            throw new DomainException("Sale number is required.");
-
-        SaleNumber = saleNumber.Trim();
-        Date = date;
-        Customer = customer;
-        Branch = branch;
-    }
-
-    public void UpdateHeader(string saleNumber, DateTime date, CustomerIdentity customer, BranchIdentity branch)
-    {
-        EnsureNotCancelled();
-        SetHeader(saleNumber, date, customer, branch);
-        AddEvent(new SaleModifiedEvent(Id));
     }
 
     public SaleItem AddItem(ProductIdentity product, int quantity, decimal unitPrice)
@@ -83,11 +63,41 @@ public class Sale
         AddEvent(new SaleCancelledEvent(Id));
     }
 
+    public void UpdateHeader(string saleNumber, DateTime date, CustomerIdentity customer, BranchIdentity branch)
+    {
+        EnsureNotCancelled();
+
+        var trimmed = saleNumber?.Trim();
+        bool changed =
+            !string.Equals(SaleNumber, trimmed, StringComparison.Ordinal) ||
+            Date != date ||
+            Customer?.Id != customer.Id ||
+            Branch?.Id != branch.Id;
+
+        if (!changed) return;
+
+        SetHeader(trimmed!, date, customer, branch);
+        AddEvent(new SaleModifiedEvent(Id));
+    }
+
+    private void SetHeader(string saleNumber, DateTime date, CustomerIdentity customer, BranchIdentity branch)
+    {
+        if (string.IsNullOrWhiteSpace(saleNumber))
+            throw new DomainException("Sale number is required.");
+
+        SaleNumber = saleNumber.Trim();
+        Date = date;
+        Customer = customer;
+        Branch = branch;
+    }
+
     private void EnsureNotCancelled()
     {
         if (Status == SaleStatus.Cancelled)
             throw new DomainException("Sale is cancelled.");
     }
 
-    private void AddEvent(object @event) => _domainEvents.Add(@event);
+    public void ClearDomainEvents() => _domainEvents.Clear();
+
+    private void AddEvent(IDomainEvent @event) => _domainEvents.Add(@event);
 }

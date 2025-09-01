@@ -7,7 +7,7 @@ set -euo pipefail
 : "${DB_USER:=dev}"
 : "${DB_PASS:=dev}"
 : "${DB_NAME:=developer_evaluation}"
-: "${API_PORT:=5056}"
+: "${API_PORT:=5119}"
 : "${PG_IMAGE:=postgres:16}"
 
 # Repositório (cobre ambos padrões usados no template)

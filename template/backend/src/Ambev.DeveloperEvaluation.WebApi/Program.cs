@@ -9,6 +9,7 @@ using Ambev.DeveloperEvaluation.WebApi.Middleware;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 
 namespace Ambev.DeveloperEvaluation.WebApi;
 
@@ -53,7 +54,8 @@ public partial class Program
             {
                 cfg.RegisterServicesFromAssemblies(
                     typeof(ApplicationLayer).Assembly,
-                    typeof(Program).Assembly
+                    typeof(Program).Assembly,
+                    typeof(CreateSaleHandler).Assembly
                 );
             });
 
